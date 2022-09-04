@@ -7,36 +7,18 @@
     <title>Dashboard</title>
 </head>
 <body>
-    <h2>Welcome TO Car Deals,  {{user.first_name}}</h2>
+    <h2>Welcome to Social Network,  {{user.first_name}}</h2>
     <a href="/logout">Sign out</a>
     <a href="/cars/new">+ Create</a>
     <div class="container">
-        <table>
-            <tr>
-                <th>Model</th>
-                <th>Year</th>
-                <th>Seller</th>
-                <th>Actions</th>
-                
-            </tr>
-            {% for car in cars %}
-            <tr>
-                <td>{{car.model}}</td>
-                <td>{{car.year}}</td>
-                <td>{{car.seller.first_name}} {{car.seller.last_name}}</td>
-                <td><a href="/cars/{{car.id}}">Show</a>
-                {% if car.seller.id  == user.id %}
-                |
-                    <a href="/cars/edit/{{car.id}}">edit</a>|
-                    <a href="/delete/{{car.id}}">Delete</a>
-                    </td>
-                
-                
-                {% endif %}
-                
-            </tr>
-            {% endfor %}
-        </table>
+        {% for friends in users %}
+        {% if user.id != friends.id %}
+        <div class="user-box">
+            <h1>{{friends.first_name}} {{friends.last_name}}</h1>
+            <a href="/message/{{friends.id}}">Message!</a>
+        </div>
+        {% endif %}
+        {% endfor %}
     </div>
 </body>
 </html>

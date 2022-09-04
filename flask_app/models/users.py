@@ -2,7 +2,7 @@ from flask_app.config.mysqlconnection import connectToMySQL
 import re
 from flask import flash
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$') 
-db = 'carsdb'
+db = 'socialnetwork'
 class User:
     @staticmethod
     def validate_register(form):
@@ -30,6 +30,7 @@ class User:
         self.password = data['password']
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
+        self.is_online = data['is_online']
         
 # Now we use class methods to query our database
     @classmethod
@@ -72,3 +73,12 @@ class User:
             return False
         return cls(result[0])
 
+    @classmethod
+    def get_friends(cls):
+        query = "SELECT * from users left join user_has_friends as friend on users.id = users_id;"
+        result = connectToMySQL(db).query_db(query)
+
+        friends = []
+        for friend in result:
+            friends.append( cls(friend) )
+        return friends
