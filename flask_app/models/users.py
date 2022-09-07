@@ -1,9 +1,10 @@
 from flask_app.config.mysqlconnection import connectToMySQL
 import re
+from flask_app.models.crypto_assets import CryptoAsset
 from flask import flash
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$') 
 db = 'socialnetwork'
-class User:
+class User(CryptoAsset):
     @staticmethod
     def validate_register(form):
         is_valid = True
@@ -31,19 +32,19 @@ class User:
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
         self.is_online = data['is_online']
-        
+        self.wallet = None
 # Now we use class methods to query our database
     @classmethod
     def get_all(cls):
-        query = "SELECT * FROM users;"
+        query = "SELECT * from users;"
         # make sure to call the connectToMySQL function with the schema you are targeting.
         results = connectToMySQL(db).query_db(query)
         # Create an empty list to append our instances of friends
-        friends = []
+        users = []
         # Iterate over the db results and create instances of friends with cls.
-        for friend in results:
-            friends.append( cls(friend) )
-        return friends
+        for user in results:
+            users.append(cls(user))
+        return users
     @classmethod
     def get_by_id(cls,data):
         query = "SELECT * FROM users WHERE id = %(id)s;"

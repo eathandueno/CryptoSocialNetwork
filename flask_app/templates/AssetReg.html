@@ -4,11 +4,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit</title>
+    <title>Add Assets</title>
 </head>
 <body>
-    <form action="/submit/profile" method="post">
-        
+    <form action="/submit_asset" method="post">
+        <label for="asset_name">Asset:</label>
+        <select id="asset_name" name="asset_name">
+            {% for option in cryptos %}
+            <option value="{{option.crypto_base}}">{{option.crypto_base}}</option>
+            {% endfor %}
+        </select>
+        <label for="asset_amount">Amount?</label>
+        <input type="number" name="asset_amount">
+        <input type="hidden" name='wallet_owner' value="{{session['user_id']}}">
+        <label for="buy_price">Buy Price?</label>
+        <input type="number" name="buy_price">
+        <input type="submit" value="Add Currency">
     </form>
     
     <a href="/home">skip</a>

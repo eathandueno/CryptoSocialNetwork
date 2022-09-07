@@ -5,20 +5,67 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <style>
+        .header{
+            display: flex;
+            flex-direction: row;
+            top: 10px;
+            justify-content: space-between;
+        }
+        .wrapper{
+            display: flex;
+            flex-direction: column;
+        }
+        .prices{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        .container{
+            display: flex;
+            flex-direction: column;
+            border: solid;
+        }
+        .wallet-container{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    </style>
 </head>
 <body>
-    <h2>Welcome to Social Network,  {{user.first_name}}</h2>
-    <a href="/logout">Sign out</a>
-    <a href="/cars/new">+ Create</a>
-    <div class="container">
-        {% for friends in users %}
-        {% if user.id != friends.id %}
-        <div class="user-box">
-            <h1>{{friends.first_name}} {{friends.last_name}}</h1>
-            <a href="/message/{{friends.id}}">Message!</a>
+    <div class="wrapper">
+        <div class="header">
+            <h2>Welcome to Social Network,  {{user.first_name}}</h2>
+            <a href="/logout">Sign out</a>
+            <a href="/add_asset">+ Add Assets</a>
         </div>
-        {% endif %}
-        {% endfor %}
+        <div class="prices">
+            {% for crypto in finalList %}
+            <h4>{{crypto.crypto_base}} / {{crypto.crypto_quote}} : {{crypto.price}}</h4>
+            {% endfor %}
+        </div>
+        <div class="container">
+            {% for friends in users %}
+            {% if user.id != friends.id %}
+            <div class="user-box">
+                <h1>{{friends.first_name}} {{friends.last_name}}</h1>
+                <a href="/message/{{friends.id}}">Message!</a>
+                <div class="wallet-container">
+                    {% for asset in wallets %}
+                    {% if asset.wallet_owner == friends.id %}
+                    <p>{{asset.asset_name}} : {{asset.asset_amount}}
+                        <br>
+                        {{asset.buy_price}}
+                    </p>
+                    <p></p>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>

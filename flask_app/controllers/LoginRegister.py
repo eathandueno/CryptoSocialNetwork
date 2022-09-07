@@ -1,6 +1,5 @@
-
-# from flask_app.models.likes import Likes
-from wsgiref import validate
+from flask_app.models.CryptoPairs import CryptoPair
+from flask_app.models.crypto_assets import CryptoAsset
 from flask_app import app
 from flask_app.config.mysqlconnection import connectToMySQL
 from flask_app.models.users import User
@@ -28,23 +27,45 @@ def register_account():
     user = User.add_one(data)
     session['user_id'] = user
     users = User.get_all()
-    return redirect('/home')
+    return redirect('/add_asset')
 
 @app.route('/login', methods=['POST'])
 def login():
-    
+
     data = {"email" : request.form['email'],
             "password" : request.form['password']}
     user_db = User.get_by_email(data)
+    
     if not user_db:
         flash("Invalid Email or Password")
         return redirect('/')
+    
     if not bcrypt.check_password_hash(user_db.password, data['password']):
         flash("Invalid Email or Password")
+    
         return redirect('/')
     session['user_id'] = user_db.id
     return redirect('/home')
 
+@app.route('/add_asset')
+def add_asset():
+    if 'user_id' not in session:
+        return redirect('/logout')
+    data = {
+        'id' : session['user_id']
+    }
+    return render_template('AssetReg.html', user = User.get_by_id(data),cryptos = CryptoPair.get_all_cryptos())
+
+@app.route('/submit_asset', methods=['POST'])
+def submit_asset():
+    data = {
+        'asset_name' : request.form['asset_name'],
+        'asset_amount' : request.form['asset_amount'],
+        'wallet_owner' : request.form['wallet_owner'],
+        'buy_price' : request.form['buy_price']
+    }
+    CryptoAsset.add_wallet_asset(data)
+    return redirect('/home')
 @app.route('/home')
 def home_page():
     if 'user_id' not in session:
@@ -52,9 +73,11 @@ def home_page():
     data = {
         'id' : session['user_id']
     }
+    cryptos = CryptoPair.get_all_cryptos() 
+    print(type(cryptos))
     
     
-    return render_template('dashboard.html', user = User.get_by_id(data), users = User.get_all() )
+    return render_template('dashboard.html', user = User.get_by_id(data), users = User.get_all(),finalList = CryptoPair.fetch_price(cryptos), wallets = CryptoAsset.get_all_wallets(), wallet_percents = CryptoPair.get_wallet_percent() )
 
 @app.route('/logout')
 def logout():

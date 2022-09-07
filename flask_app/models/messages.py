@@ -21,7 +21,7 @@ class Messages(User):
     
     @classmethod
     def get_all(cls, data):
-        query = "SELECT * from messages WHERE sender =  %(self)s and particpants = %(id)s or sender = %(id)s and particpants = %(self)s;"
+        query = "SELECT * from messages WHERE sender =  %(self)s and particpants = %(id)s or sender = %(id)s and particpants = %(self)s  order by  created_at;"
         
         results = connectToMySQL(db).query_db(query, data)
         messages = []
