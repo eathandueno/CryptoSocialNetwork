@@ -12,9 +12,29 @@ class CryptoAsset():
         self.updated_at = data['updated_at']
         self.buy_price = data['buy_price']
     
-    # @staticmethod
-    # def validate_asset(form):
-        
+    @classmethod
+    def add_wallet_asset(cls,data):
+        query = "SELECT * from crypto_assets left join users as owner on crypto_assets.wallet_owner = owner.id where owner.id = %(wallet_owner)s and asset_name = %(asset_name)s;"
+        results = connectToMySQL(db).query_db(query,data)
+        print(results)
+        if results:
+            asset = cls(results[0])
+            asset.buy_price == (  (float(asset.buy_price) * float(asset.asset_amount)) + ( float(data['buy_price']) * float(data['asset_amount']))  )  / (float(asset.asset_amount) + float(data['asset_amount']))
+            asset.asset_amount += float(data['asset_amount'])
+            
+            data = {
+                'id' : asset.id,
+                'asset_name' : asset.asset_name,
+                'asset_amount' : asset.asset_amount,
+                'wallet_owner' : asset.wallet_owner,
+                'buy_price' : asset.buy_price
+            }
+            query = "UPDATE crypto_assets SET asset_amount = %(asset_amount)s, buy_price = %(buy_price)s where id = %(id)s;"
+            return connectToMySQL(db).query_db(query, data)
+        else:
+            query = "INSERT into crypto_assets(asset_name, asset_amount, wallet_owner, buy_price) values (%(asset_name)s, %(asset_amount)s, %(wallet_owner)s, %(buy_price)s);"
+            return connectToMySQL(db).query_db(query, data)
+
 
 
     @classmethod
@@ -33,6 +53,6 @@ class CryptoAsset():
         return wallets
 
     @classmethod
-    def add_wallet_asset(cls, data):
-        query = "INSERT into crypto_assets(asset_name, asset_amount, wallet_owner, buy_price) values (%(asset_name)s, %(asset_amount)s, %(wallet_owner)s, %(buy_price)s);"
+    def edit_wallet_asset(cls, data):
+        query = "UPDATE crypto_assets set asset_name = %(asset_name)s, asset_amount = %(asset_amount)s, buy_price = %(buy_price)s where id = %(id)s;"
         return  connectToMySQL(db).query_db(query, data)

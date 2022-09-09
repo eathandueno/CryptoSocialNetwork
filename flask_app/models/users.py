@@ -1,5 +1,6 @@
 from flask_app.config.mysqlconnection import connectToMySQL
 import re
+from flask_app.models.CryptoPairs import CryptoPair
 from flask_app.models.crypto_assets import CryptoAsset
 from flask import flash
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$') 
@@ -32,7 +33,8 @@ class User(CryptoAsset):
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
         self.is_online = data['is_online']
-        self.wallet = None
+        self.wallet_items = None
+        self.percent = None
 # Now we use class methods to query our database
     @classmethod
     def get_all(cls):
@@ -83,3 +85,47 @@ class User(CryptoAsset):
         for friend in result:
             friends.append( cls(friend) )
         return friends
+
+    @classmethod
+    def get_user_wallets(cls):
+        query = "SELECT * from users left join crypto_assets on users.id = crypto_assets.wallet_owner left join crypto_pairs on crypto_assets.asset_name = crypto_pairs.crypto_base where crypto_quote = 'USD';"
+        results = connectToMySQL(db).query_db(query)
+        wallets = []
+        for result in results:
+            result1 = cls(result)
+            asset_info = {
+                'id' : result['id'],
+                'crypto_base' : result['crypto_base'],
+                'crypto_quote': result['crypto_quote'],
+                'search_base' : result['search_base'],
+                'search_quote' : result['search_quote'],
+                'created_at' : result['created_at'],
+                'updated_at' : result['updated_at'],
+                'temp_base' : result['temp_base'],
+                'temp_quote' : result['temp_quote']
+            }
+            assetItem = CryptoPair(asset_info)
+            wallet_data = {
+                'id' : result['id'],
+                'asset_name' : result['asset_name'],
+                'asset_amount' : result['asset_amount'],
+                'wallet_owner' : result['wallet_owner'],
+                'created_at' : result['created_at'],
+                'updated_at' : result['updated_at'],
+                'buy_price' : result['buy_price']
+            }
+            
+            CryptoPair.fetch_price(assetItem)
+            
+            assetItem.wallet_owner = CryptoAsset(wallet_data)
+            result1.wallet_items = assetItem
+            print(result1.wallet_items.wallet_owner.buy_price)
+            if assetItem.price > result1.wallet_items.wallet_owner.buy_price:
+                win = assetItem.price / result1.wallet_items.wallet_owner.buy_price 
+                result1.percent = (win -1)*100
+            elif assetItem.price < result1.wallet_items.wallet_owner.buy_price:
+                loss = assetItem.price / result1.wallet_items.wallet_owner.buy_price
+                result1.percent = -(loss*100)
+            wallets.append(result1)
+            
+        return wallets
