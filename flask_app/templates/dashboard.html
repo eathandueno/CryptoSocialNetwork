@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    
     <style>
         .header{
             display: flex;
@@ -24,42 +26,72 @@
         .container{
             display: flex;
             flex-direction: column;
-            border: solid;
+            
         }
         .wallet-container{
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: space-around;
+            align-items: center;
+            
+            
+        }
+        .crypto {
+            display: flex;
+            flex-direction: column;
+        }
+        .gain {
+            color: green;
+            
+        }
+        .loss {
+            color: rgb(221, 24, 24);
+            
+        }
+        .user-box{
+            border: solid;
+            margin: 10px;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <div class="header">
-            <h2>Welcome to Social Network,  {{user.first_name}}</h2>
+            <h2>Welcome to Crypto Network,  {{user.first_name}}</h2>
             <a href="/logout">Sign out</a>
+            <a href="/edit">Edit</a>
             <a href="/add_asset">+ Add Assets</a>
         </div>
         <div class="prices">
-            {% for crypto in finalList %}
-            <h4>{{crypto.crypto_base}} / {{crypto.crypto_quote}} : {{crypto.price}}</h4>
+            {% for crypto in prices %}
+            <h6>{{crypto.crypto_base}} / {{crypto.crypto_quote}} : {{crypto.price}}</h6>
             {% endfor %}
         </div>
         <div class="container">
-            {% for friends in users %}
+            {% for friends in userList %}
             {% if user.id != friends.id %}
             <div class="user-box">
                 <h1>{{friends.first_name}} {{friends.last_name}}</h1>
                 <a href="/message/{{friends.id}}">Message!</a>
                 <div class="wallet-container">
-                    {% for asset in wallets %}
-                    {% if asset.wallet_owner == friends.id %}
-                    <p>{{asset.asset_name}} : {{asset.asset_amount}}
-                        <br>
-                        {{asset.buy_price}}
-                    </p>
-                    <p></p>
+                    {% for asset in wallet_percents %}
+                    {% if asset.wallet_items.wallet_owner.wallet_owner == friends.id %}
+                    <div class="crypto">
+                        <p>
+                            {{asset.wallet_items.wallet_owner.asset_name}} : {{asset.wallet_items.wallet_owner.asset_amount}}
+                        </p>
+                        <p>{{asset.wallet_items.wallet_owner.buy_price}} $ Avg.</p>   
+                        <p class="percent">  {{ "{:.2f}".format(asset.percent)}} %</p>
+
+                        <div class="account-details">
+                            <p>Total Cost:</p>
+                            <p>{{asset.wallet_items.wallet_owner.buy_price * asset.wallet_items.wallet_owner.asset_amount}}</p>
+                        </div>
+                    </div>
+                        
                     {% endif %}
+                    
                     {% endfor %}
                 </div>
             </div>
@@ -67,5 +99,6 @@
             {% endfor %}
         </div>
     </div>
+    <script src="/static/index.js"></script>
 </body>
 </html>
