@@ -1,7 +1,7 @@
 
 from flask import flash
 import requests
-from flask_app.models.crypto_assets import CryptoAsset
+
 from flask_app.config.mysqlconnection import connectToMySQL
 db = 'socialnetwork'
 class CryptoPair:
@@ -43,26 +43,7 @@ class CryptoPair:
             crypto.price = livePrice
         return crypto
 
-    @classmethod
-    def get_wallet_percent(cls):
-        query = "SELECT * from crypto_assets left join crypto_pairs as cryptos on asset_name = crypto_base WHERE crypto_quote = 'USD';"
-        results = connectToMySQL(db).query_db(query)
-        assets = []
-        for asset in results:
-            assetShow = cls(asset)
-            asset_owner = {
-                'id' : asset['id'],
-                'asset_name' : asset['asset_name'],
-                'asset_amount' : asset['asset_amount'],
-                'wallet_owner' : asset['wallet_owner'],
-                'created_at' : asset['created_at'],
-                'updated_at' : asset['updated_at'],
-                'buy_price' : asset['buy_price']
-            }
-            assetShow.wallet_owner = CryptoAsset(asset_owner)
-            assets.append(assetShow)
-        CryptoPair.fetch_price(assets)
-        
-        return assets
+
 
     
+

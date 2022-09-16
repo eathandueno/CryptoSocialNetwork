@@ -25,6 +25,7 @@ class Messages(User):
         results = connectToMySQL(db).query_db(query, data)
         messages = []
         for message in results:
+            print(message['sender'])
             messages.append(cls(message)) 
         return messages
         

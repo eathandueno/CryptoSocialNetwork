@@ -1,4 +1,5 @@
 from flask import flash
+from flask_app.models.CryptoPairs import CryptoPair
 
 from flask_app.config.mysqlconnection import connectToMySQL
 db = 'socialnetwork'
@@ -11,6 +12,8 @@ class CryptoAsset():
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
         self.buy_price = data['buy_price']
+        self.percent = None
+        self.price = None
     
     @classmethod
     def add_wallet_asset(cls,data):
@@ -39,9 +42,28 @@ class CryptoAsset():
 
     @classmethod
     def get_wallet(cls, data):
-        query = "SELECT * from crypto_assets WHERE %(id)s"
-        results = connectToMySQL(db).query_db(query,data)
-        return cls(results[0])
+        query = "SELECT * from crypto_assets inner join crypto_pairs as cryptos on crypto_assets.asset_name = cryptos.crypto_base where cryptos.crypto_quote = 'USD' and wallet_owner = {};".format(data)
+        results = connectToMySQL(db).query_db(query)
+        matchingWallets = []
+        for each in results:
+            assetCase = cls(each)
+            crypto_data = {
+                'id' : each['cryptos.id'],
+                'crypto_base' : each['crypto_base'],
+                'crypto_quote' : each['crypto_quote'],
+                'search_base' : each['search_base'],
+                'search_quote' : each['search_quote'],
+                'created_at' : each['created_at'],
+                'updated_at' : each['updated_at'],
+                'temp_base' : each['temp_base'],
+                'temp_quote' : each['temp_quote']
+            }
+            assetCase.currency = CryptoPair(crypto_data)
+            
+            print(CryptoPair.fetch_price(assetCase.currency))
+
+            
+        return matchingWallets
 
     @classmethod
     def get_all_wallets(cls):
@@ -56,3 +78,14 @@ class CryptoAsset():
     def edit_wallet_asset(cls, data):
         query = "UPDATE crypto_assets set asset_name = %(asset_name)s, asset_amount = %(asset_amount)s, buy_price = %(buy_price)s where id = %(id)s;"
         return  connectToMySQL(db).query_db(query, data)
+
+    @classmethod
+    def fetch_wallets(cls,users):
+        for user in users:
+            query = "SELECT * from crypto_assets where wallet_owner = {}".format(user.id)
+            results = connectToMySQL(db).query_db(query)
+            wallet = []
+            for result in results:
+                wallet.append(cls(result))
+            user.wallet_items = wallet
+        return users
