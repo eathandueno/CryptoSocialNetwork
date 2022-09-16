@@ -9,43 +9,73 @@
         .container{
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background-color: rgb(119, 110, 110);
+            width: 90%;
+            height:440px;
             padding: 50px;
+            overflow-y: scroll;
         }
-        .message{
+        .message, .self-message, .friends-message{
             
-            justify-content: space-between;
-            width: 500px;
+            
+            width: 30%;
             border: solid;
             background-color: grey;
-            color: rgb(95, 251, 95);
+            
         }
         .textbox{
             width: 500px;
+            position: relative;
+            bottom: 0%;
+            right: 0%;
+            left: 70%;
+        }
+        .friends-message{
+            position: relative;
+            left: 0px;
+            color: rgb(95, 251, 95);
+            margin:5px;
+            border-radius: 5px;
+            width: fit-content;
+            padding: 25px;
+        }
+        .self-message{
+            left: 85%;
+            right: 0px;
+            position: relative;
+            color: rgb(101, 199, 245);
+            margin:5px;
+            padding: 25px;
+            border-radius: 5px;
+            width: max-content;
         }
     </style>
 </head>
-<body>
-    <a href="/home">Home</a>
-    <h1>{{friend.first_name}}'s conversation</h1>
-    <div class="container">
-        {% for message in messages %}
-        <div class="message">
-        <p>{{message.messages}}</p>
-        <p>{{message.created_at}}</p>
-        {% if message.sender == friend.id %}
-        <p>From: {{friend.first_name}}</p>
-        {% else %}
-        <p>From: {{user.first_name}}</p>
-        {% endif %}
+    <body>
+        <a href="/home">Home</a>
+        <h1>{{friend.first_name}}'s conversation</h1>
+        <div class="container">
+            {% for message in messages %}
+            {% if message.sender == friend.id %}
+            <div class="friends-message">
+                <p>{{message.messages}}</p>
+                <p>{{message.created_at}}</p>
+                <p>From: {{friend.first_name}}</p>
+            </div>
+            {% elif message.sender == user.id %}
+            <div class="self-message">
+                <p>{{message.messages}}</p>
+                <p>{{message.created_at}}</p>
+                <p>Sent by me !</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+            
         </div>
-        {% endfor %}
         <form action="/submit/{{friend.id}}" method="post" class="textbox">
             <input type="text" width="500px" name="messages">
             <input type="submit">
         </form>
-    </div>
-    
-</body>
+        
+    </body>
 </html>

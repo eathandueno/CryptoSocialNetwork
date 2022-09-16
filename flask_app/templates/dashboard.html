@@ -10,9 +10,14 @@
     <style>
         .header{
             display: flex;
-            flex-direction: row;
-            top: 10px;
+            flex-direction: column;
+            top: 5px;
             justify-content: space-between;
+            position: fixed;
+            top: 10px;
+            width: 100%;
+            border-bottom: solid;
+            background-color: grey;
         }
         .wrapper{
             display: flex;
@@ -22,11 +27,13 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
+            position: relative;
+            top: auto;
         }
         .container{
             display: flex;
             flex-direction: column;
-            
+            padding: 100px;
         }
         .wallet-container{
             display: flex;
@@ -53,49 +60,67 @@
             margin: 10px;
             padding: 10px;
         }
+        .wallet-item{
+            display: flex;
+            flex-direction: column;
+        }
+        .account-info{
+            display: flex;
+            flex-direction: column;
+            
+        }
+        body{
+            display: flex;
+            
+            flex-direction: column;
+            
+        }
+
     </style>
 </head>
 <body>
     <div class="wrapper">
         <div class="header">
-            <h2>Welcome to Crypto Network,  {{user.first_name}}</h2>
-            <a href="/logout">Sign out</a>
-            <a href="/edit">Edit</a>
-            <a href="/add_asset">+ Add Assets</a>
+            <div>
+                <h2>Welcome to Crypto Network,  {{user.first_name}}</h2>
+                <a href="/logout">Sign out</a>
+                <a href="/edit">Edit</a>
+                <a href="/add_asset">+ Add Assets</a>
+            </div>
+            
+            <div class="prices">
+                {% for crypto in prices %}
+                <h6>{{crypto.search}} : {{crypto.fetch_price()}}</h6>
+                {% endfor %}
+            </div>
         </div>
-        <div class="prices">
-            {% for crypto in prices %}
-            <h6>{{crypto.crypto_base}} / {{crypto.crypto_quote}} : {{crypto.price}}</h6>
-            {% endfor %}
-        </div>
-        <div class="container">
-            {% for friends in userList %}
-            {% if user.id != friends.id %}
-            <div class="user-box">
-                <h1>{{friends.first_name}} {{friends.last_name}}</h1>
-                <a href="/message/{{friends.id}}">Message!</a>
-                <div class="wallet-container">
-                    {% for asset in wallet_percents %}
-                    {% if asset.wallet_items.wallet_owner.wallet_owner == friends.id %}
-                    <div class="crypto">
-                        <p>
-                            {{asset.wallet_items.wallet_owner.asset_name}} : {{asset.wallet_items.wallet_owner.asset_amount}}
-                        </p>
-                        <p>{{asset.wallet_items.wallet_owner.buy_price}} $ Avg.</p>   
-                        <p class="percent">  {{ "{:.2f}".format(asset.percent)}} %</p>
+        
+        
 
-                        <div class="account-details">
-                            <p>Total Cost:</p>
-                            <p>{{asset.wallet_items.wallet_owner.buy_price * asset.wallet_items.wallet_owner.asset_amount}}</p>
-                        </div>
+        <div class="container">
+            {% for user in users %}
+            <div class="user-box">
+                <div class="account-info">
+                    <p>{{user.first_name}} {{user.last_name}}</p>
+                    <p>${{"{:.2F}".format(user.totalCash)}} :   {{user.percent}}%</p>
+                    <a href="/message/{{user.id}}">Message!</a>
+                </div>
+                
+                <div class="wallet-container">
+                    {% for item in user.wallet_items %}
+                    <div class="wallet-item">
+                        <p>{{item.asset_amount}} {{item.asset_name}}</p>
+                        <p>{{item.buy_price}}</p>
+                            {% if item.percent > 0 %}
+                            <p class="gain">{{item.percent}}%</p>
+                            {% else %}
+                            <p class="loss">{{item.percent}}%</p>
+                            {% endif %}
                     </div>
                         
-                    {% endif %}
-                    
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
             {% endfor %}
         </div>
     </div>

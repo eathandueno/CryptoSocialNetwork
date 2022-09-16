@@ -20,7 +20,7 @@
     <h1>Add Assets to your portfolio !</h1>
     <div class="prices">
         {% for crypto in prices %}
-        <h6>{{crypto.crypto_base}} / {{crypto.crypto_quote}} : {{crypto.price}}</h6>
+        <h6>{{crypto.search}} : {{crypto.fetch_price()}}</h6>
         {% endfor %}
     </div>
     <form action="/submit_asset" method="post">
