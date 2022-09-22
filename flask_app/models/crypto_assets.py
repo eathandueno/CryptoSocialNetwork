@@ -12,8 +12,8 @@ class CryptoAsset():
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
         self.buy_price = data['buy_price']
-        self.percent = None
-        self.price = None
+        self.percent = 0.0
+        self.price = 0.0
     
     @classmethod
     def add_wallet_asset(cls,data):

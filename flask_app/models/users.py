@@ -35,7 +35,7 @@ class User(CryptoAsset):
         self.updated_at = data['updated_at']
         self.is_online = data['is_online']
         self.wallet_items = []
-        self.percent = None
+        self.percent = 0.0
         self.totalCash = 0
 # Now we use class methods to query our database
     @classmethod
@@ -93,25 +93,33 @@ class User(CryptoAsset):
 
             user.matchWalletToAsset(cryptos)
             for asset in user.wallet_items:
-                if asset.buy_price < asset.price:
-                    asset.percent = float("{:.2F}".format((asset.price / asset.buy_price) * 100))
-                elif asset.buy_price > asset.price:
-                    asset.percent = float("{:.2F}".format(((asset.price / asset.buy_price )-1)*100))
-                else:
-                    asset.percent = int(0)
+                    buy = float(asset.buy_price)
+                    price = float(asset.price)
+                    
+                    if buy < price:
+                        asset.percent = float("{:.2F}".format(((asset.price / asset.buy_price)-1) * 100))
+                    elif buy > price:
+                        asset.percent = float("{:.2F}".format(((asset.price / asset.buy_price )-1)*100))
+                    else:
+                        asset.percent = int(0)
     
     def totalPercent(lists):
         for user in lists:
             currentValue = 0
             purchaseValue = 0
             for asset in user.wallet_items:
-                currentValue +=asset.price * asset.asset_amount
                 purchaseValue += asset.buy_price * asset.asset_amount
+                if asset.price == None:
+                    currentValue += asset.buy_price * asset.asset_amount
+                else:
+                    currentValue +=asset.price * asset.asset_amount
             user.totalCash = currentValue
             if currentValue > purchaseValue:
                 user.percent = float("{:.2F}".format((currentValue / purchaseValue) *100))
             elif currentValue < purchaseValue:
                 user.percent = float("{:.2F}".format(((currentValue/purchaseValue)-1)*100))
+            else:
+                user.percent = 0.0
 
     def sortPercent(lists):
         return lists.percent

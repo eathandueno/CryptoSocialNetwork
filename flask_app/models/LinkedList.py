@@ -5,8 +5,9 @@ class Node:
         self.next = None
 
 class Cryptos:
-    def __init__(self,altname,base,quote):
-        self.search = altname
+    def __init__(self,search,altname,base,quote):
+        self.search = search
+        self.altname = altname
         self.base = base
         self.quote = quote
     
@@ -147,17 +148,27 @@ json = resp.json()['result']
 def get_all():
     linkedTest = LinkedList()
     for value in json:
+        search = value
         altname = json[value]['altname']
         base = json[value]['base']
         quote = json[value]['quote']
-        linkedTest.appendList(Cryptos(altname,base,quote))
+        linkedTest.appendList(Cryptos(search,altname,base,quote))
         
     return linkedTest
 
 favs = []
 all = get_all()
-print(all.getByContent('ETHUSD'))
-# favs.append(all.get(469))
-# favs.append(all.get(566))
-# favs.append(all.get(129))
-# favs.append(all.get(491))
+
+ethSearch = all.getByContent('XETHZUSD')[0]
+btcSearch = all.getByContent('XXBTZUSD')[0]
+solSearch = all.getByContent('SOLUSD')[1]
+crvSearch = all.getByContent('CRVUSD')[0]
+adaSearch = all.getByContent('ADAUSD')[0]
+dotSearch = all.getByContent('DOTUSD')[0]
+
+favs.append(all.get(crvSearch))
+favs.append(all.get(ethSearch))
+favs.append(all.get(solSearch))
+favs.append(all.get(btcSearch))
+favs.append(all.get(adaSearch))
+favs.append(all.get(dotSearch))
