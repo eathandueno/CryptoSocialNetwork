@@ -7,6 +7,9 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <a href="/home">Home</a>
+    {% for asset in user.wallet_items %}
+    <p>asset.asset_name</p>
+    {% endfor %}
 </body>
 </html>

@@ -14,7 +14,7 @@
             top: 5px;
             justify-content: space-between;
             position: fixed;
-            top: 10px;
+            top: 0px;
             width: 100%;
             border-bottom: solid;
             background-color: grey;
@@ -59,6 +59,7 @@
             border: solid;
             margin: 10px;
             padding: 10px;
+            background-color: #6D72C3;
         }
         .wallet-item{
             display: flex;
@@ -71,7 +72,7 @@
         }
         body{
             display: flex;
-            
+            background-color:#E5D4ED ;
             flex-direction: column;
             
         }
@@ -90,7 +91,7 @@
             
             <div class="prices">
                 {% for crypto in prices %}
-                <h6>{{crypto.search}} : {{crypto.fetch_price()}}</h6>
+                <h6>{{crypto.altname}} : {{crypto.fetch_price()}}</h6>
                 {% endfor %}
             </div>
         </div>
@@ -101,9 +102,11 @@
             {% for user in users %}
             <div class="user-box">
                 <div class="account-info">
-                    <p>{{user.first_name}} {{user.last_name}}</p>
+                    <h3>{{user.first_name}} {{user.last_name}}</h3>
                     <p>${{"{:.2F}".format(user.totalCash)}} :   {{user.percent}}%</p>
-                    <a href="/message/{{user.id}}">Message!</a>
+                    <a href="/message/{{user.id}}">
+                        <button>Message</button>
+                    </a>
                 </div>
                 
                 <div class="wallet-container">

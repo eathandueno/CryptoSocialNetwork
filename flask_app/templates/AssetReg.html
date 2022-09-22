@@ -26,8 +26,8 @@
     <form action="/submit_asset" method="post">
         <label for="asset_name">Asset:</label>
         <select id="asset_name" name="asset_name">
-            {% for option in cryptos %}
-            <option value="{{option.crypto_base}}">{{option.crypto_base}}</option>
+            {% for option in prices %}
+            <option value="{{option.altname}}">{{option.altname}}</option>
             {% endfor %}
         </select>
         <label for="asset_amount">Amount?</label>
